@@ -12,9 +12,9 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "adm-zip": "^0.6.1",
     "express": "^5.2.1"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "git+https://github.com/JFresnedaFuentespina/Testing-TFG-DAW.git"

@@ -1,13 +1,13 @@
 const canvas = document.querySelector("#game");
 
-const gamePath = "/Game/TheThreeFacesWEBGL/Build";
+const gamePath = "/Game/temp/TheThreeFacesWEBGL/Build";
 
 const config = {
     dataUrl: gamePath + "/TheThreeFacesWEBGL.data.gz",
     frameworkUrl: gamePath + "/TheThreeFacesWEBGL.framework.js.gz",
     codeUrl: gamePath + "/TheThreeFacesWEBGL.wasm.gz",
 
-    streamingAssetsUrl: "/Game/TheThreeFacesWEBGL/StreamingAssets",
+    streamingAssetsUrl: gamePath + "/StreamingAssets",
 
     companyName: "DefaultCompany",
     productName: "The Three Faces",
