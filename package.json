@@ -13,5 +13,14 @@
   "type": "commonjs",
   "dependencies": {
     "express": "^5.2.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JFresnedaFuentespina/Testing-TFG-DAW.git"
+  },
+  "bugs": {
+    "url": "https://github.com/JFresnedaFuentespina/Testing-TFG-DAW/issues"
+  },
+  "homepage": "https://github.com/JFresnedaFuentespina/Testing-TFG-DAW#readme"
 }
