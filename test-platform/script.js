@@ -1,6 +1,6 @@
 const canvas = document.querySelector("#game");
 
-const gamePath = "/temp/TheThreeFacesWEBGL/Build";
+const gamePath = "/Game/TheThreeFacesWEBGL/TheThreeFacesWEBGL/Build";
 
 const config = {
     dataUrl: gamePath + "/TheThreeFacesWEBGL.data.gz",
