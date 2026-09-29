@@ -6,168 +6,169 @@ const AdmZip = require("adm-zip");
 const app = express();
 const PORT = 3000;
 
-// Rutas
-const gameZip = path.join(__dirname, "Game", "TheThreeFacesWEBGL.zip");
-const gameFolder = path.join(__dirname, "Game", "TheThreeFacesWEBGL");
+// ===============================
+// RUTAS
+// ===============================
 
-// Página web
-app.use(express.static(path.join(__dirname, "test-platform")));
+const gameZip = path.join(
+    __dirname,
+    "Game",
+    "TheThreeFacesWEBGL.zip"
+);
 
-// Extraer el juego si todavía no existe
+const gameFolder = path.join(
+    __dirname,
+    "Game",
+    "TheThreeFacesWEBGL"
+);
+
+
+// ===============================
+// PÁGINA DE LA PLATAFORMA
+// ===============================
+
+app.use(
+    express.static(
+        path.join(__dirname, "test-platform")
+    )
+);
+
+
+// ===============================
+// DESCOMPRIMIR EL JUEGO
+// ===============================
+
 if (!fs.existsSync(gameFolder)) {
-    console.log("Descomprimiendo TheThreeFacesWEBGL.zip...");
+
+    console.log(
+        "Descomprimiendo TheThreeFacesWEBGL.zip..."
+    );
+
     try {
+
         const zip = new AdmZip(gameZip);
 
         zip.extractAllTo(gameFolder, true);
-        console.log("Juego descomprimido correctamente");
 
-    } catch (error) {
-        console.error("Error al descomprimir el juego:", error);
-    }
-
-}
-
-// Archivos de Unity
-app.use("/Game", express.static(path.join(__dirname, "Game"), {
-
-    setHeaders: (res, filePath) => {
-
-        // Servir la página de la plataforma
-        app.use(express.static(testPlatformPath));
-
-
-        if (filePath.endsWith(".wasm.gz")) {
-
-            res.setHeader(
-                "Content-Type",
-                "application/wasm"
-            );
-
-        } else if (filePath.endsWith(".js.gz")) {
-
-            res.setHeader(
-                "Content-Type",
-                "application/javascript"
-            );
-
-        } else {
-
-            res.setHeader(
-                "Content-Type",
-                "application/octet-stream"
-            );
-        }
-
-        console.log(`Juego descomprimido en ${extractPath}`);
-
-    } catch(error) {
-
-        console.error(
-            `Error al descomprimir ${game}.zip:`,
-            error
+        console.log(
+            "Juego descomprimido correctamente"
         );
 
-        return res
-            .status(500)
-            .send("Error al descomprimir el juego");
+    } catch (error) {
+
+        console.error(
+            "Error al descomprimir el juego:",
+            error
+        );
     }
 }
 
-    // Buscar index.html
-    const indexPath = path.join(
-    extractPath,
-    "index.html"
-);
-
-if (!fs.existsSync(indexPath)) {
-
-    return res
-        .status(404)
-        .send("index.html no encontrado en el juego");
-}
-
-res.sendFile(indexPath);
-});
-
 
 // ===============================
-// ARCHIVOS DE LOS JUEGOS
+// ARCHIVOS DE UNITY
 // ===============================
 
-app.use("/play/:game", (req, res, next) => {
+app.use(
+    "/Game",
+    express.static(
+        path.join(__dirname, "Game"),
+        {
+            setHeaders: (res, filePath) => {
 
-    const game = req.params.game;
+                if (filePath.endsWith(".gz")) {
 
-    const gamePath = path.join(
-        tempPath,
-        game
-    );
-
-    express.static(gamePath, {
-
-        setHeaders: (res, filePath) => {
-
-            if (filePath.endsWith(".gz")) {
-
-                res.setHeader(
-                    "Content-Encoding",
-                    "gzip"
-                );
-
-                if (filePath.endsWith(".wasm.gz")) {
-
+                    // Decimos al navegador que el archivo
+                    // está comprimido con Gzip
                     res.setHeader(
-                        "Content-Type",
-                        "application/wasm"
+                        "Content-Encoding",
+                        "gzip"
                     );
 
-                } else if (filePath.endsWith(".js.gz")) {
+                    if (
+                        filePath.endsWith(".wasm.gz")
+                    ) {
 
-                    res.setHeader(
-                        "Content-Type",
-                        "application/javascript"
-                    );
+                        res.setHeader(
+                            "Content-Type",
+                            "application/wasm"
+                        );
 
-                } else {
+                    } else if (
+                        filePath.endsWith(".js.gz")
+                    ) {
 
-                    res.setHeader(
-                        "Content-Type",
-                        "application/octet-stream"
-                    );
+                        res.setHeader(
+                            "Content-Type",
+                            "application/javascript"
+                        );
+
+                    } else {
+
+                        res.setHeader(
+                            "Content-Type",
+                            "application/octet-stream"
+                        );
+                    }
                 }
             }
         }
+    )
+);
 
-    })(req, res, next);
+
+// ===============================
+// LIMPIAR JUEGO AL CERRAR
+// ===============================
+
+function limpiarJuego() {
+
+    if (!fs.existsSync(gameFolder)) {
+        return;
+    }
+
+    try {
+
+        fs.rmSync(
+            gameFolder,
+            {
+                recursive: true,
+                force: true
+            }
+        );
+
+        console.log(
+            "Carpeta del juego eliminada."
+        );
+
+    } catch (error) {
+
+        console.error(
+            "Error eliminando la carpeta del juego:",
+            error
+        );
+    }
+}
+
+
+// ===============================
+// CERRAR SERVIDOR
+// ===============================
+
+process.on("SIGINT", () => {
+
+    console.log(
+        "\nCerrando servidor..."
+    );
+
+    limpiarJuego();
+
+    process.exit(0);
 });
 
 
 // ===============================
 // SERVIDOR
 // ===============================
-
-// Borrar el juego descomprimido al cerrar el servidor
-function limpiarJuego() {
-    if (fs.existsSync(gameFolder)) {
-        try {
-            fs.rmSync(gameFolder, {
-                recursive: true,
-                force: true
-            });
-            console.log("Carpeta del juego eliminada.");
-        }
-        catch (error) {
-            console.error("Error eliminando la carpeta del juego");
-        }
-    }
-}
-
-process.on("SIGINT", () => {
-    console.log("\Cerrando servidor...");
-    limpiarJuego();
-    process.exit(0);
-});
 
 app.listen(PORT, () => {
 
