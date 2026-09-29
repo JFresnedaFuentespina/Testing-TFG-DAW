@@ -62,6 +62,28 @@ app.use("/Game", express.static(path.join(__dirname, "Game"), {
     }
 }));
 
+// Borrar el juego descomprimido al cerrar el servidor
+function limpiarJuego() {
+    if (fs.existsSync(gameFolder)) {
+        try {
+            fs.rmSync(gameFolder, {
+                recursive: true,
+                force: true
+            });
+            console.log("Carpeta del juego eliminada.");
+        }
+        catch (error) {
+            console.error("Error eliminando la carpeta del juego");
+        }
+    }
+}
+
+process.on("SIGINT", () => {
+    console.log("\Cerrando servidor...");
+    limpiarJuego();
+    process.exit(0);
+});
+
 app.listen(PORT, () => {
 
     console.log(
