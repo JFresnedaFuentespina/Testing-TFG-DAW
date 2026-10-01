@@ -48,7 +48,7 @@ if (!fs.existsSync(gameFolder)) {
 
         const zip = new AdmZip(gameZip);
 
-        zip.extractAllTo(gameFolder, true);
+        zip.extractAllTo(gameFolder, true); // Sobrescribir archivos existentes
 
         console.log(
             "Juego descomprimido correctamente"
@@ -68,7 +68,7 @@ if (!fs.existsSync(gameFolder)) {
 // ARCHIVOS DE UNITY
 // ===============================
 
-app.use(
+app.use( // En la ruta /Game
     "/Game",
     express.static(
         path.join(__dirname, "Game"),
@@ -84,7 +84,7 @@ app.use(
                         "gzip"
                     );
 
-                    if (
+                    if (// Si el archivo es .wasm.gz, le decimos al navegador que es un archivo WebAssembly
                         filePath.endsWith(".wasm.gz")
                     ) {
 
@@ -93,7 +93,7 @@ app.use(
                             "application/wasm"
                         );
 
-                    } else if (
+                    } else if ( // Si el archivo es .js.gz, le decimos al navegador que es un archivo JavaScript
                         filePath.endsWith(".js.gz")
                     ) {
 
@@ -102,7 +102,7 @@ app.use(
                             "application/javascript"
                         );
 
-                    } else {
+                    } else { // Si el archivo es .data.gz, le decimos al navegador que es un archivo binario
 
                         res.setHeader(
                             "Content-Type",
@@ -128,7 +128,7 @@ function limpiarJuego() {
 
     try {
 
-        fs.rmSync(
+        fs.rmSync( // Eliminamos la carpeta del juego
             gameFolder,
             {
                 recursive: true,
